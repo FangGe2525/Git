@@ -1,0 +1,71 @@
+# ---- 依赖 ----
+node_modules/
+bower_components/
+vendor/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- 构建产物 ----
+dist/
+build/
+out/
+target/
+*.min.js
+*.map
+
+# ---- 日志与缓存 ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.cache/
+tmp/
+temp/
+
+# ---- 环境与密钥 ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+!*.pub
+secrets.*
+credentials.*
+
+# ---- 数据库 ----
+*.sqlite
+*.sqlite3
+*.db
+
+# ---- 编辑器 / IDE ----
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- 系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 办公软件临时文件 ----
+~$*
+*.tmp
