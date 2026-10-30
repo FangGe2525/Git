@@ -1,4 +1,4 @@
-# 启动移动端开发服务器
+﻿# 启动移动端开发服务器
 # 用法：.\scripts\dev-mobile.ps1
 $ErrorActionPreference = 'Stop'
 

@@ -1,4 +1,4 @@
-# 编译/打包后端。优先使用项目内 .tools 工具链，其次 mvnw，最后 PATH 中的 mvn
+﻿# 编译/打包后端。优先使用项目内 .tools 工具链，其次 mvnw，最后 PATH 中的 mvn
 # 用法：.\scripts\build-backend.ps1 [-Package]
 param(
     [switch]$Package

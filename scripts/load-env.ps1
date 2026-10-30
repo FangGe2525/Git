@@ -1,4 +1,4 @@
-# 读取项目根目录的 .env，注入当前会话的环境变量
+﻿# 读取项目根目录的 .env，注入当前会话的环境变量
 # 用法：. .\scripts\load-env.ps1
 $ErrorActionPreference = 'Stop'
 
