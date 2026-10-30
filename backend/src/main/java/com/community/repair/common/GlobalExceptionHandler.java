@@ -2,6 +2,7 @@ package com.community.repair.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("；"));
         return ResponseEntity.badRequest()
                 .body(ApiResponse.fail(ErrorCode.BAD_REQUEST, message));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnreadable(HttpMessageNotReadableException ex) {
+        log.warn("请求体解析失败: {}", ex.getMessage());
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(ErrorCode.BAD_REQUEST, "请求体格式错误，应为合法的 JSON"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
