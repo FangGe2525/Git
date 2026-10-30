@@ -24,7 +24,8 @@ public class GlobalExceptionHandler {
             case 403 -> HttpStatus.FORBIDDEN;
             case 404 -> HttpStatus.NOT_FOUND;
             case 400 -> HttpStatus.BAD_REQUEST;
-            default -> HttpStatus.OK;
+            // 业务规则不满足（如非法状态流转）按 400 返回，避免与成功响应混淆
+            default -> HttpStatus.BAD_REQUEST;
         };
         return ResponseEntity.status(status).body(ApiResponse.fail(ex.getCode(), ex.getMessage()));
     }
