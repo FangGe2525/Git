@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { storage, TOKEN_KEY } from '../utils/storage'
 
 const router = createRouter({
   history: createWebHistory('/admin/'),
@@ -21,7 +22,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem('token')
+  const token = storage.get(TOKEN_KEY)
   if (!to.meta.public && !token) {
     return { path: '/login', query: { redirect: to.fullPath } }
   }

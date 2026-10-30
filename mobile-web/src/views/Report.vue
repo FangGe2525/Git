@@ -90,9 +90,11 @@ import { showToast, showSuccessToast } from 'vant'
 import { createTicket, uploadFile } from '../api/ticket'
 import { compressImage } from '../utils/image'
 import { CATEGORIES, PROBLEM_TYPES } from '../utils/status'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 
 const point = ref('')
 const building = ref('')
@@ -112,6 +114,11 @@ const categoryColumns = CATEGORIES.map((name) => ({ text: name, value: name }))
 const problemColumns = PROBLEM_TYPES.map((name) => ({ text: name, value: name }))
 
 onMounted(() => {
+  if (!auth.isOwner) {
+    showToast('仅业主可在此报修，客服请用管理后台代报')
+    router.replace('/tickets')
+    return
+  }
   const queryPoint = String(route.query.point || '')
   if (queryPoint) {
     point.value = queryPoint

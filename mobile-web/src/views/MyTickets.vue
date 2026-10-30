@@ -40,7 +40,7 @@
 
     <van-empty v-if="!list.length && finished" description="还没有工单" />
 
-    <div class="fab">
+    <div v-if="auth.isOwner" class="fab">
       <van-button type="primary" round icon="plus" @click="router.push('/report')">我要报修</van-button>
     </div>
   </div>

@@ -1,6 +1,10 @@
 <template>
   <div class="page">
-    <van-nav-bar title="工单详情" left-text="返回" left-arrow @click-left="router.back()" />
+    <van-nav-bar title="工单详情" left-text="返回" left-arrow @click-left="router.back()">
+      <template #right>
+        <span class="account">{{ auth.displayName }}·{{ roleText }}</span>
+      </template>
+    </van-nav-bar>
 
     <template v-if="ticket">
       <div class="head">
@@ -127,6 +131,12 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
+// 顶部显示当前登录身份，避免多标签页切换账号时看错
+const roleText = computed(() => {
+  const map: Record<string, string> = { OWNER: '业主', WORKER: '维修工', CS: '客服', COMMUNITY: '社区' }
+  return map[auth.role] || ''
+})
+
 const detail = ref<any>(null)
 const acting = ref(false)
 const showFinish = ref(false)
@@ -246,6 +256,11 @@ onMounted(load)
 .head {
   background: #fff;
   padding: 16px;
+}
+
+.account {
+  font-size: 12px;
+  color: #969799;
 }
 
 .row {
