@@ -55,8 +55,28 @@ if (-not $env:UPLOAD_DIR) {
 }
 
 # ---- 5. 判断是否需要重新打包 ----
+function Test-BootJar {
+    param([string]$Path)
+    try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction Stop
+        $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
+        try {
+            return [bool]($zip.Entries | Where-Object { $_.FullName -like 'BOOT-INF/*' } | Select-Object -First 1)
+        } finally {
+            $zip.Dispose()
+        }
+    } catch {
+        return $false
+    }
+}
+
 $jar = Join-Path $backend 'target\community-repair-0.1.0-SNAPSHOT.jar'
 $needBuild = $Rebuild -or (-not (Test-Path $jar))
+if (-not $needBuild -and -not (Test-BootJar $jar)) {
+    # 打包中断会留下没有启动清单的普通 jar，必须重打
+    Write-Host '现有 jar 不是可执行包（缺少 BOOT-INF），需要重新打包。' -ForegroundColor Yellow
+    $needBuild = $true
+}
 if (-not $needBuild) {
     $jarTime = (Get-Item $jar).LastWriteTime
     $newest = $null
@@ -95,6 +115,9 @@ if ($needBuild) {
         if ($LASTEXITCODE -ne 0) { throw "打包失败（exit $LASTEXITCODE）" }
     } finally {
         Pop-Location
+    }
+    if (-not (Test-BootJar $jar)) {
+        throw '打包后仍不是可执行 jar：可能残留了旧文件，请删除 backend\target 后重试'
     }
 }
 
