@@ -26,8 +26,12 @@
 │   │   ├── config/           # 安全、MyBatis-Plus 配置
 │   │   └── common/           # 统一响应、异常、错误码
 │   └── src/main/resources/application.yml
-├── admin-web/                # 管理后台（P3）
-├── mobile-web/               # 移动 H5（P4）
+├── admin-web/                # 管理后台（P4，尚未创建）
+├── mobile-web/               # 移动 H5：报修、我的工单、维修端处理
+│   ├── src/api/              # 请求封装
+│   ├── src/views/            # 登录 / 报修 / 列表 / 详情
+│   ├── src/stores/           # Pinia
+│   └── src/utils/            # 图片压缩、状态字典
 ├── docs/
 │   ├── 开发指导.md            # 完整开发方案
 │   └── database/schema.sql   # 建表脚本
@@ -74,6 +78,18 @@ curl -X POST http://localhost:8080/api/auth/login \
   -d '{"username":"admin","password":"123456"}'
 ```
 
+### 5. 启动移动端
+
+```powershell
+cd mobile-web
+npm install
+npm run dev
+```
+
+打开 <http://localhost:5174/m/>，用 `owner1 / 123456` 登录。
+
+扫码报修的入口形如 <http://localhost:5174/m/report?point=B3-1201>，`point` 会自动拆成楼栋与房号。
+
 ## 实施进度
 
 | 阶段 | 内容 | 状态 |
@@ -81,13 +97,14 @@ curl -X POST http://localhost:8080/api/auth/login \
 | P0 | 仓库骨架、建表脚本、开发文档 | ✅ |
 | P1 | 后端骨架、健康检查、JWT 登录与角色鉴权 | ✅ |
 | P2 | 工单核心：schema v2、六态状态机、流转日志、派单/接单/完工/确认 | ✅ |
-| P3 | 管理后台（列表、详情、时间线） | ⬜ |
-| P4 | 移动 H5（扫码报修、我的工单） | ⬜ |
-| P5 | 图片/视频上传与分片 | ⬜ |
-| P6 | DeepSeek 分类 + 规则派单 | ⬜ |
-| P7 | 站内通知 + SSE + 短信兜底 | ⬜ |
-| P8 | 完工确认、评价、收费与定时催缴 | ⬜ |
-| P9 | 统计图表、Nginx 部署 | ⬜ |
+| P3 | 移动 H5：扫码报修、图片压缩上传、我的工单、维修端接单/完工/确认/返修 | ✅ |
+| P4 | 管理后台：工单中心（列表、筛选、详情、时间线、派单） | ⬜ |
+| P5 | 评价与回访 | ⬜ |
+| P6 | 消息推送：站内通知 + SSE + 短信兜底 | ⬜ |
+| P7 | 自动派单规则 + 工作台看板 | ⬜ |
+| P8 | 统计看板（报修量、超时率、响应/完工时长、评价分布） | ⬜ |
+| P9 | 收费（简版）+ 基础配置（楼栋二维码、值班表、消息模板） | ⬜ |
+| P10 | 部署（Nginx + HTTPS） | ⬜ |
 
 ## 设计要点
 
