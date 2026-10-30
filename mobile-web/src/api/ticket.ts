@@ -13,8 +13,12 @@ export const acceptTicket = (id: number | string) => http.put(`/tickets/${id}/ac
 
 export const startTicket = (id: number | string) => http.put(`/tickets/${id}/start`)
 
-export const finishTicket = (id: number | string, result: string, feeAmount?: number) =>
-  http.put(`/tickets/${id}/finish`, { result, feeAmount })
+export const finishTicket = (
+  id: number | string,
+  result: string,
+  mediaUrls: string[],
+  feeAmount?: number
+) => http.put(`/tickets/${id}/finish`, { result, mediaUrls, feeAmount })
 
 export const confirmTicket = (id: number | string) => http.put(`/tickets/${id}/confirm`)
 

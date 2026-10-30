@@ -30,7 +30,7 @@
         <van-cell v-if="ticket.reworkCount" title="返修次数" :value="`${ticket.reworkCount} 次`" />
       </van-cell-group>
 
-      <van-cell-group v-if="ticket.mediaUrls?.length" inset class="section" title="现场照片">
+      <van-cell-group v-if="ticket.mediaUrls?.length" inset class="section" title="报修照片">
         <div class="images">
           <van-image
             v-for="(url, i) in ticket.mediaUrls"
@@ -41,6 +41,21 @@
             fit="cover"
             radius="6"
             @click="preview(i)"
+          />
+        </div>
+      </van-cell-group>
+
+      <van-cell-group v-if="ticket.finishMediaUrls?.length" inset class="section" title="完工照片">
+        <div class="images">
+          <van-image
+            v-for="(url, i) in ticket.finishMediaUrls"
+            :key="i"
+            :src="url"
+            width="88"
+            height="88"
+            fit="cover"
+            radius="6"
+            @click="previewFinish(i)"
           />
         </div>
       </van-cell-group>
@@ -104,6 +119,18 @@
           label="费用"
           placeholder="无偿维修可留空"
         />
+        <div class="photo-block">
+          <div class="photo-label">完工照片 <span class="required">*</span></div>
+          <div class="photo-tip">拍摄维修后的现场，业主凭此确认完工，最多 6 张</div>
+          <van-uploader
+            v-model="finishFiles"
+            :max-count="6"
+            accept="image/*"
+            capture="camera"
+            :after-read="onFinishPhoto"
+            @delete="onDeleteFinishPhoto"
+          />
+        </div>
         <van-button type="primary" block round :loading="acting" @click="onFinish">提交</van-button>
       </div>
     </van-popup>
@@ -122,8 +149,10 @@ import {
   returnTicket,
   reworkTicket,
   startTicket,
+  uploadFile,
   urgeTicket
 } from '../api/ticket'
+import { compressImage } from '../utils/image'
 import { useAuthStore } from '../stores/auth'
 import { SOURCE_LABEL, STATUS_LABEL, STATUS_TYPE, formatTime } from '../utils/status'
 
@@ -142,6 +171,7 @@ const acting = ref(false)
 const showFinish = ref(false)
 const finishResult = ref('')
 const feeAmount = ref('')
+const finishFiles = ref<any[]>([])
 
 const ticket = computed(() => detail.value?.ticket)
 const logs = computed(() => detail.value?.logs || [])
@@ -194,17 +224,50 @@ async function act(type: 'accept' | 'start' | 'confirm' | 'urge') {
   }
 }
 
+async function onFinishPhoto(item: any) {
+  item.status = 'uploading'
+  item.message = '上传中'
+  try {
+    const compressed = await compressImage(item.file)
+    const res: any = await uploadFile(compressed)
+    item.url = res.data.url
+    item.status = 'done'
+    item.message = ''
+  } catch {
+    item.status = 'failed'
+    item.message = '上传失败'
+  }
+}
+
+function onDeleteFinishPhoto(item: any) {
+  if (item?.url) {
+    finishFiles.value = finishFiles.value.filter((f) => f !== item)
+  }
+}
+
 async function onFinish() {
   if (!finishResult.value.trim()) {
     showToast('请填写维修结果')
     return
   }
+  if (finishFiles.value.some((f) => f.status === 'uploading')) {
+    showToast('照片还在上传，请稍候')
+    return
+  }
+  const photos = finishFiles.value.filter((f) => f.url).map((f) => f.url)
+  if (photos.length === 0) {
+    showToast('请至少拍摄一张完工照片')
+    return
+  }
   acting.value = true
   try {
     const fee = feeAmount.value ? Number(feeAmount.value) : undefined
-    await finishTicket(route.params.id as string, finishResult.value.trim(), fee)
+    await finishTicket(route.params.id as string, finishResult.value.trim(), photos, fee)
     showFinish.value = false
-    showSuccessToast('已提交，等待确认')
+    finishFiles.value = []
+    finishResult.value = ''
+    feeAmount.value = ''
+    showSuccessToast('已提交，等待业主确认')
     await load()
   } catch {
     // 统一提示
@@ -247,6 +310,10 @@ async function onReturn() {
 
 function preview(index: number) {
   showImagePreview({ images: ticket.value.mediaUrls, startPosition: index })
+}
+
+function previewFinish(index: number) {
+  showImagePreview({ images: ticket.value.finishMediaUrls, startPosition: index })
 }
 
 onMounted(load)
@@ -380,5 +447,25 @@ onMounted(load)
   margin: 0 0 12px;
   font-size: 16px;
   text-align: center;
+}
+
+.photo-block {
+  padding: 12px 0 16px;
+}
+
+.photo-label {
+  font-size: 14px;
+  color: #323233;
+  margin-bottom: 4px;
+}
+
+.required {
+  color: #ee0a24;
+}
+
+.photo-tip {
+  font-size: 12px;
+  color: #969799;
+  margin-bottom: 10px;
 }
 </style>

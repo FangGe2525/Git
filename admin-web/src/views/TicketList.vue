@@ -132,11 +132,26 @@
         </el-descriptions>
 
         <div v-if="detail.ticket.mediaUrls?.length" class="images">
+          <div class="images-label">报修照片</div>
           <el-image
             v-for="(url, i) in detail.ticket.mediaUrls"
-            :key="i"
+            :key="'m' + i"
             :src="url"
             :preview-src-list="detail.ticket.mediaUrls"
+            :initial-index="i"
+            fit="cover"
+            class="thumb"
+            preview-teleported
+          />
+        </div>
+
+        <div v-if="detail.ticket.finishMediaUrls?.length" class="images">
+          <div class="images-label">完工照片</div>
+          <el-image
+            v-for="(url, i) in detail.ticket.finishMediaUrls"
+            :key="'f' + i"
+            :src="url"
+            :preview-src-list="detail.ticket.finishMediaUrls"
             :initial-index="i"
             fit="cover"
             class="thumb"
@@ -417,6 +432,13 @@ onMounted(async () => {
   gap: 8px;
   margin-top: 16px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.images-label {
+  width: 100%;
+  font-size: 13px;
+  color: #909399;
 }
 
 .thumb {

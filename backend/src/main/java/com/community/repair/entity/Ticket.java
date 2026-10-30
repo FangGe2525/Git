@@ -54,6 +54,10 @@ public class Ticket {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> mediaUrls;
 
+    /** 维修工完工提交时拍摄的照片，业主确认时的凭证 */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> finishMediaUrls;
+
     private TicketStatus status;
 
     private TicketPriority priority;

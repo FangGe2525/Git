@@ -253,9 +253,21 @@ public class TicketService {
         requireAssignedWorker(ticket, me);
         stateMachine.assertCanTransit(ticket.getStatus(), TicketStatus.VERIFYING);
 
+        // 完工必须有现场照片作为凭证，业主据此确认
+        List<String> photos = request.getMediaUrls();
+        if (photos == null || photos.isEmpty()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "请至少上传一张完工照片");
+        }
+        for (String url : photos) {
+            if (url == null || !url.startsWith("/uploads/")) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "完工照片地址不合法");
+            }
+        }
+
         TicketStatus from = ticket.getStatus();
         ticket.setStatus(TicketStatus.VERIFYING);
         ticket.setFinishedAt(LocalDateTime.now());
+        ticket.setFinishMediaUrls(photos);
 
         BigDecimal fee = request.getFeeAmount();
         if (fee != null && fee.compareTo(BigDecimal.ZERO) > 0) {
@@ -265,7 +277,9 @@ public class TicketService {
             ticket.setFeeStatus(FeeStatus.NONE);
         }
         ticketMapper.updateById(ticket);
-        writeLog(ticket.getId(), TicketAction.FINISH, from, ticket.getStatus(), me.getId(), request.getResult());
+
+        String remark = request.getResult() + "（附 " + photos.size() + " 张完工照片）";
+        writeLog(ticket.getId(), TicketAction.FINISH, from, ticket.getStatus(), me.getId(), remark);
         return ticket;
     }
 

@@ -59,7 +59,8 @@ CREATE TABLE `tickets` (
     `category`           VARCHAR(50)  DEFAULT NULL COMMENT '工种：水电/瓦工/电梯…',
     `problem_type`       VARCHAR(50)  DEFAULT NULL COMMENT '问题分类：漏水/断电…',
     `description`        TEXT,
-    `media_urls`         JSON         DEFAULT NULL COMMENT '图片/视频访问地址数组',
+    `media_urls`         JSON         DEFAULT NULL COMMENT '报修时上传的图片/视频地址数组',
+    `finish_media_urls`  JSON         DEFAULT NULL COMMENT '维修工完工提交的照片，业主确认时可见',
     `status`             ENUM('PENDING','ACCEPTED','REPAIRING','VERIFYING','COMPLETED','CANCELED')
                                       NOT NULL DEFAULT 'PENDING',
     `priority`           ENUM('LOW','MEDIUM','HIGH') NOT NULL DEFAULT 'MEDIUM',
